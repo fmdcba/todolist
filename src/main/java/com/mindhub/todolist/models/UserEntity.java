@@ -58,4 +58,12 @@ public class UserEntity {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Set<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(Set<Task> tasks) {
+        this.tasks = tasks;
+    }
 }
