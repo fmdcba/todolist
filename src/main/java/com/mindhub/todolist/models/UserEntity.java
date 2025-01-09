@@ -2,6 +2,9 @@ package com.mindhub.todolist.models;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 public class UserEntity {
 
@@ -16,6 +19,9 @@ public class UserEntity {
 
     @Column(unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Task> tasks = new HashSet<>();
 
     public UserEntity() {}
 

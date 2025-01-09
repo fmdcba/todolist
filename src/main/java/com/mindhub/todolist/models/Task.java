@@ -21,12 +21,16 @@ public class Task {
     @Column(nullable = false)
     private TaskStatus status;
 
+    @ManyToOne
+    private UserEntity user;
+
     public Task() {}
 
-    public Task(String title, String description, TaskStatus status) {
+    public Task(String title, String description, TaskStatus status, UserEntity user) {
         this.title = title;
         this.description = description;
         this.status = status;
+        this.user = user;
     }
 
     public Long getId() {
@@ -55,5 +59,13 @@ public class Task {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }
