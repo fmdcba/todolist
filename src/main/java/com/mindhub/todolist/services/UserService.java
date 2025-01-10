@@ -20,4 +20,6 @@ public interface UserService {
     UserEntity getUserById(Long id) throws NotFoundException;
 
     UserEntity saveUser(UserEntity newUser);
+
+    //TODO: Add validations methods here
 }

@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserDTOById(Long id) throws NotFoundException, InvalidArgumentException {
         validateId(id);
+
         return new UserDTO(getUserById(id));
     }
 
@@ -28,13 +29,15 @@ public class UserServiceImpl implements UserService {
         validateUser(newUser);
         checkIfUserExists(newUser);
         UserEntity user = new UserEntity(newUser.username(), newUser.password(), newUser.email());
+
         saveUser(user);
     }
 
     @Override
     public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException {
         UserEntity user = getUserById(id);
-        validateUser(updatedUser);
+        // TODO: This validation does not respect the patch way, fix it or use a PUT.
+        //validateUser(updatedUser);
         checkIfUserExists(updatedUser);
 
         saveUser(user);
@@ -90,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     public void CheckIfUserExistsById(Long id) throws NotFoundException {
         if(!userRepository.existsById(id)) {
-            throw new NotFoundException("User not exists");
+            throw new NotFoundException("User does not exists");
         }
     }
 }
