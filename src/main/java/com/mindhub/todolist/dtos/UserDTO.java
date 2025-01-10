@@ -24,4 +24,20 @@ public class UserDTO {
                 .map(task -> task.getTitle())
                 .toList();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<String> getTasks() {
+        return tasks;
+    }
 }
