@@ -26,17 +26,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(NewUserDTO newUser, Long id) {
+    public void updateUser(NewUserDTO updatedUser, Long id) {
         UserEntity user = getUserById(id);
 
-        if (newUser.username() != null && !newUser.username().isBlank()) {
-            user.setUsername(newUser.username());
+        if (updatedUser.username() != null && !updatedUser.username().isBlank()) {
+            user.setUsername(updatedUser.username());
         }
-        if (newUser.email() != null && !newUser.email().isBlank()) {
-            user.setEmail(newUser.email());
+        if (updatedUser.email() != null && !updatedUser.email().isBlank()) {
+            user.setEmail(updatedUser.email());
         }
-        if (newUser.password() != null && !newUser.password().isBlank()) {
-            user.setPassword(newUser.password());
+        if (updatedUser.password() != null && !updatedUser.password().isBlank()) {
+            user.setPassword(updatedUser.password());
         }
 
         saveUser(user);
