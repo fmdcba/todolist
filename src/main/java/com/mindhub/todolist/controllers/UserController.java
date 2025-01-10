@@ -29,15 +29,19 @@ public class UserController {
     }
 
     @PatchMapping("/user/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO updatedUser,@PathVariable Long id) {
+    public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser,@PathVariable Long id) {
         UserEntity user = userRepository.findById(id).orElse(null);
 
-        if (updatedUser.getUsername() != null && !updatedUser.getUsername().isBlank()) {
-            user.setUsername(updatedUser.getUsername());
+        if (updatedUser.username() != null && !updatedUser.username().isBlank()) {
+            user.setUsername(updatedUser.username());
         }
-        if (updatedUser.getEmail() != null && !updatedUser.getEmail().isBlank()) {
-            user.setEmail(updatedUser.getEmail());
+        if (updatedUser.email() != null && !updatedUser.email().isBlank()) {
+            user.setEmail(updatedUser.email());
         }
+        if (updatedUser.password() != null && !updatedUser.password().isBlank()) {
+            user.setPassword(updatedUser.password());
+        }
+
 
         userRepository.save(user);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
