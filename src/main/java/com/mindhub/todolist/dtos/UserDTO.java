@@ -14,9 +14,6 @@ public class UserDTO {
 
     private List<String> tasks;
 
-    public UserDTO() {
-    }
-
     public UserDTO (UserEntity user) {
         this.id = user.getId();
         this.username = user.getUsername();
