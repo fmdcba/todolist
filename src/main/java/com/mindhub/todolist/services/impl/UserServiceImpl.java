@@ -26,13 +26,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(NewUserDTO user) {
+    public void updateUser(NewUserDTO newUser, Long id) {
+        UserEntity user = getUserById(id);
 
+        if (newUser.username() != null && !newUser.username().isBlank()) {
+            user.setUsername(newUser.username());
+        }
+        if (newUser.email() != null && !newUser.email().isBlank()) {
+            user.setEmail(newUser.email());
+        }
+        if (newUser.password() != null && !newUser.password().isBlank()) {
+            user.setPassword(newUser.password());
+        }
+
+        saveUser(user);
     }
 
     @Override
     public void deleteUser(Long id) {
-
+        userRepository.deleteById(id);
     }
 
     @Override

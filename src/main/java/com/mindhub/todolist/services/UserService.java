@@ -10,11 +10,11 @@ public interface UserService {
 
     void createUser(NewUserDTO user);
 
-    void updateUser(NewUserDTO user);
+    void updateUser(NewUserDTO user, Long id);
 
     void deleteUser(Long id);
 
     UserEntity getUserById(Long id);
 
-    UserEntity saveUser(UserEntity user);
+    UserEntity saveUser(UserEntity newUser);
 }
