@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) throws InvalidArgumentException, NotFoundException {
         validateId(id);
-        CheckIfUserExistsById(id);
+        checkIfUserExistsById(id);
 
         userRepository.deleteById(id);
     }
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void CheckIfUserExistsById(Long id) throws NotFoundException {
+    public void checkIfUserExistsById(Long id) throws NotFoundException {
         if(!userRepository.existsById(id)) {
             throw new NotFoundException("User does not exists");
         }
