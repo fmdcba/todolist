@@ -8,20 +8,18 @@ public class UserDTO {
 
     private Long id;
 
-    private String username;
+    private String username, email;
 
-    private String email;
+    private List<TaskDTO> tasks;
 
-    private List<String> tasks;
-
-    public UserDTO (UserEntity user) {
-        this.id = user.getId();
-        this.username = user.getUsername();
-        this.email = user.getEmail();
-        this.tasks = user
+    public UserDTO(UserEntity user) {
+        id = user.getId();
+        username = user.getUsername();
+        email = user.getEmail();
+        tasks = user
                 .getTasks()
                 .stream()
-                .map(task -> task.getTitle())
+                .map(task -> new TaskDTO(task))
                 .toList();
     }
 
@@ -37,7 +35,7 @@ public class UserDTO {
         return email;
     }
 
-    public List<String> getTasks() {
+    public List<TaskDTO> getTasks() {
         return tasks;
     }
 }
