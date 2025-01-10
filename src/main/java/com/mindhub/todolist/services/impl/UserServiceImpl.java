@@ -3,7 +3,6 @@ package com.mindhub.todolist.services.impl;
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
-import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
@@ -55,7 +54,6 @@ public class UserServiceImpl implements UserService {
     public UserEntity saveUser(UserEntity user) {
         return userRepository.save(user);
     }
-
 
     public void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException {
         if (userRepository.existsByUsername(newUser.username())) {
