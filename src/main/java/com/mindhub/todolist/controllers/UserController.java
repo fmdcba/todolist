@@ -42,8 +42,13 @@ public class UserController {
             user.setPassword(updatedUser.password());
         }
 
-
         userRepository.save(user);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return new ResponseEntity<>("deleted user", HttpStatus.OK);
     }
 }
