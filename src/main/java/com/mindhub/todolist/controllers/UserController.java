@@ -9,13 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/{id}")
     public UserDTO getUser(@PathVariable long id) {
         return userService.getUserDTOById(id);
     }
@@ -26,13 +26,13 @@ public class UserController {
         return new ResponseEntity<>("User created", HttpStatus.CREATED);
     }
 
-    @PatchMapping("/user/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser,@PathVariable Long id) {
         userService.updateUser(updatedUser, id);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>("deleted user", HttpStatus.OK);
