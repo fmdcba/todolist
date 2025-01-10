@@ -2,6 +2,7 @@ package com.mindhub.todolist.services.impl;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
+import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.repositories.TaskRepository;
 import com.mindhub.todolist.services.TaskService;
@@ -15,7 +16,7 @@ public class TaskServiceImpl implements TaskService {
     private TaskRepository taskRepository;
 
     @Override
-    public TaskDTO getTaskDTOById(Long id) {
+    public TaskDTO getTaskDTOById(Long id) throws NotFoundException {
         return new TaskDTO(getTaskById(id));
     }
 
@@ -26,7 +27,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateTask(NewTaskDTO updatedTask, Long id) {
+    public void updateTask(NewTaskDTO updatedTask, Long id) throws NotFoundException {
         Task task = getTaskById(id);
 
         if (updatedTask.title() != null && !updatedTask.title().isBlank()) {
@@ -51,8 +52,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id).orElse(null);
+    public Task getTaskById(Long id) throws NotFoundException {
+        return taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
     @Override

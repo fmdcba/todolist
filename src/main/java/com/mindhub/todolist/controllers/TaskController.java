@@ -2,6 +2,7 @@ package com.mindhub.todolist.controllers;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
+import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping("/{id}")
-    public TaskDTO getTask(@PathVariable long id) {
+    public TaskDTO getTask(@PathVariable long id) throws NotFoundException {
         return taskService.getTaskDTOById(id);
     }
 
@@ -27,7 +28,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateTask(@RequestBody NewTaskDTO updatedTask, @PathVariable Long id) {
+    public ResponseEntity<?> updateTask(@RequestBody NewTaskDTO updatedTask, @PathVariable Long id) throws NotFoundException {
         taskService.updateTask(updatedTask, id);
         return new ResponseEntity<>("Task updated", HttpStatus.OK);
     }
@@ -37,5 +38,4 @@ public class TaskController {
         taskService.deleteTask(id);
         return new ResponseEntity<>("Task deleted", HttpStatus.OK);
     }
-
 }
