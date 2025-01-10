@@ -4,6 +4,7 @@ import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
+import com.mindhub.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +17,18 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO) {
-        UserEntity newUser = new UserEntity(newUserDTO.username(), newUserDTO.password(), newUserDTO.email());
-        userRepository.save(newUser);
-        return new ResponseEntity<>("User created", HttpStatus.CREATED);
-    }
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/user/{id}")
-    public UserDTO getUser() {
-        return new UserDTO(userRepository.findById(1L).orElse(null));
+    public UserDTO getUser(@PathVariable long id) {
+        return userService.getUserDTOById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO) {
+        userService.createUser(newUserDTO);
+        return new ResponseEntity<>("User created", HttpStatus.CREATED);
     }
 
     @PatchMapping("/user/{id}")
