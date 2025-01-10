@@ -18,15 +18,13 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDTO getUserDTOById(Long id) throws NotFoundException, InvalidArgumentException {
-        validateId(id);
+    public UserDTO getUserDTOById(Long id) throws NotFoundException {
 
         return new UserDTO(getUserById(id));
     }
 
     @Override
-    public void createUser(NewUserDTO newUser) throws InvalidArgumentException, AlreadyExistsException {
-        validateUser(newUser);
+    public void createUser(NewUserDTO newUser) throws AlreadyExistsException {
         checkIfUserExists(newUser);
         UserEntity user = new UserEntity(newUser.username(), newUser.password(), newUser.email());
 
@@ -34,18 +32,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException {
+    public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException {
         UserEntity user = getUserById(id);
-        // TODO: This validation does not respect the patch way, fix it or use a PUT.
-        //validateUser(updatedUser);
         checkIfUserExists(updatedUser);
 
         saveUser(user);
     }
 
     @Override
-    public void deleteUser(Long id) throws InvalidArgumentException, NotFoundException {
-        validateId(id);
+    public void deleteUser(Long id) throws NotFoundException {
         checkIfUserExistsById(id);
 
         userRepository.deleteById(id);
@@ -61,25 +56,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    public void validateId(Long id) throws InvalidArgumentException {
-        if (id == null  || id <= 0) {
-            throw new InvalidArgumentException("Invalid ID");
-        }
-    }
-
-    public void validateUser(NewUserDTO newUser) throws InvalidArgumentException {
-        if (newUser.username() == null || newUser.username().isBlank()) {
-            throw new InvalidArgumentException("Username must not be null or empty");
-        }
-
-        if (newUser.email() == null || newUser.email().isBlank()) {
-            throw new InvalidArgumentException("Email must not be null or empty");
-        }
-
-        if (newUser.password() == null || newUser.password().isBlank()) {
-            throw new InvalidArgumentException("Password must not be null or empty");
-        }
-    }
 
     public void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException {
         if (userRepository.existsByUsername(newUser.username())) {

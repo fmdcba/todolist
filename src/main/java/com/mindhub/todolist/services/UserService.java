@@ -21,11 +21,7 @@ public interface UserService {
 
     UserEntity saveUser(UserEntity newUser);
 
-    //TODO: Add validations methods here
-
-    void validateId(Long id) throws InvalidArgumentException;
-
-    void validateUser(NewUserDTO newUser) throws InvalidArgumentException;
+    //TODO: move business logic validations methods here
 
     void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException;
 
