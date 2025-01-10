@@ -33,9 +33,9 @@ public class TaskController {
         @ApiResponse(responseCode = "201", description = "confirmation msg on body: Task created")
         @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: Task title must not be null or empty or user does not exists")
     public ResponseEntity<?> createTask(@RequestBody NewTaskDTO newTaskDTO) throws InvalidArgumentException, NotFoundException {
-        taskService.createTask(newTaskDTO);
+        TaskDTO savedTask = taskService.createTask(newTaskDTO);
         validateTask(newTaskDTO);
-        return new ResponseEntity<>("Task created", HttpStatus.CREATED);
+        return new ResponseEntity<>(savedTask, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")

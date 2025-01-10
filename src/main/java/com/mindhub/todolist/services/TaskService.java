@@ -10,7 +10,7 @@ public interface TaskService {
 
     TaskDTO getTaskDTOById(Long id) throws NotFoundException, InvalidArgumentException;
 
-    void createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
+    TaskDTO createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
 
     void updateTask(NewTaskDTO updatedTask, Long id) throws NotFoundException, InvalidArgumentException;
 
