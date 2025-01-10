@@ -6,6 +6,8 @@ import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,18 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user", description = "Return a user and it's attributes")
+        @ApiResponse(responseCode = "200", description = "Return the user with a status code of OK")
+        @ApiResponse(responseCode = "400", description = "Error msg when trying to get with inexistent or invalid ID")
     public UserDTO getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
         validateId(id);
         return userService.getUserDTOById(id);
     }
 
     @PostMapping
+    @Operation(summary = "Create user", description = "Recieves a user, posts it and return a confirmation message")
+        @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
+        @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO) throws AlreadyExistsException, InvalidArgumentException {
         userService.createUser(newUserDTO);
         validateUser(newUserDTO);
@@ -32,12 +40,18 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Edit user", description = "Edit a user or any of it's field")
+        @ApiResponse(responseCode = "200", description = "confirmation msg on body: User updated")
+        @ApiResponse(responseCode = "404", description = "When trying to patch inexistent user. Confirmation msg on body: user not found or the required fields")
     public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser,@PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException {
         userService.updateUser(updatedUser, id);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user", description = "Deletes a user")
+        @ApiResponse(responseCode = "200", description = "confirmation msg on body: User deleted")
+        @ApiResponse(responseCode = "400", description = "When trying to delete a user with invalid ID. Confimations msg on body: invalid ID")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) throws InvalidArgumentException, NotFoundException {
         validateId(id);
         userService.deleteUser(id);

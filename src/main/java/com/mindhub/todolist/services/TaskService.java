@@ -10,7 +10,7 @@ public interface TaskService {
 
     TaskDTO getTaskDTOById(Long id) throws NotFoundException, InvalidArgumentException;
 
-    void createTask(NewTaskDTO task) throws InvalidArgumentException;
+    void createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
 
     void updateTask(NewTaskDTO updatedTask, Long id) throws NotFoundException, InvalidArgumentException;
 
@@ -19,4 +19,6 @@ public interface TaskService {
     Task getTaskById(Long id) throws NotFoundException;
 
     Task saveTask(Task newTask);
+
+    void checkIfTaskExistsById (Long id) throws NotFoundException;
 }
