@@ -19,8 +19,4 @@ public interface TaskService {
     Task getTaskById(Long id) throws NotFoundException;
 
     Task saveTask(Task newTask);
-
-    void validateId(Long id) throws InvalidArgumentException;
-
-    void validateTask(NewTaskDTO newTaskDTO) throws InvalidArgumentException;
 }
