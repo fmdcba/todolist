@@ -23,7 +23,7 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "Get user", description = "Return a user and it's attributes")
         @ApiResponse(responseCode = "200", description = "Return the user with a status code of OK")
-        @ApiResponse(responseCode = "400", description = "Error msg when trying to get with inexistent or invalid ID")
+        @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
     public UserDTO getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
         validateId(id);
         return userService.getUserDTOById(id);
@@ -34,16 +34,17 @@ public class UserController {
         @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
         @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO) throws AlreadyExistsException, InvalidArgumentException {
-        userService.createUser(newUserDTO);
         validateUser(newUserDTO);
+        userService.createUser(newUserDTO);
         return new ResponseEntity<>("User created", HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Edit user", description = "Edit a user or any of it's field")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: User updated")
-        @ApiResponse(responseCode = "404", description = "When trying to patch inexistent user. Confirmation msg on body: user not found or the required fields")
+        @ApiResponse(responseCode = "404", description = "When trying to patch non existent user. Confirmation msg on body: user not found")
     public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser,@PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException {
+        validateId(id);
         userService.updateUser(updatedUser, id);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
     }
