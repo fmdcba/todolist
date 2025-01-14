@@ -17,6 +17,8 @@ public class UserEntity {
 
     private String password;
 
+    private RoleType role = RoleType.USER;
+
     @Column(unique = true)
     private String email;
 
@@ -65,5 +67,13 @@ public class UserEntity {
 
     public void setTasks(Set<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 }
