@@ -8,10 +8,14 @@ import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -25,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(NewUserDTO newUser) throws AlreadyExistsException {
         checkIfUserExists(newUser);
-        UserEntity user = new UserEntity(newUser.username(), newUser.password(), newUser.email());
+        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email());
 
         saveUser(user);
     }
