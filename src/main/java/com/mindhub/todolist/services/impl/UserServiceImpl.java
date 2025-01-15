@@ -1,15 +1,22 @@
 package com.mindhub.todolist.services.impl;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
+import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.dtos.UserDTO;
+import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.models.RoleType;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,9 +34,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Set<UserRecordDTO> getAllUsers(){
+        List<UserEntity> users = userRepository.findAll();
+        Set<UserRecordDTO>  userRecords = users
+                .stream()
+                .map(userEntity -> new UserRecordDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getRole())).collect(Collectors.toSet());
+        return userRecords;
+    }
+
+    @Override
     public void createUser(NewUserDTO newUser) throws AlreadyExistsException {
         checkIfUserExists(newUser);
-        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email());
+        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), RoleType.USER);
+
+        saveUser(user);
+    }
+
+    @Override
+    public void createAdmin(NewUserDTO newUser) throws AlreadyExistsException {
+        checkIfUserExists(newUser);
+        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), RoleType.ADMIN);
 
         saveUser(user);
     }
@@ -48,6 +72,8 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(id);
     }
+
+    // Validations
 
     @Override
     public UserEntity getUserById(Long id) throws NotFoundException {

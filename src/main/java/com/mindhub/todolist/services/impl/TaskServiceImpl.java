@@ -2,13 +2,21 @@ package com.mindhub.todolist.services.impl;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
+import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.models.Task;
+import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.TaskRepository;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -20,8 +28,17 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDTO getTaskDTOById(Long id) throws NotFoundException {
-
+        checkIfUserHasPermissionForTask(id);
         return new TaskDTO(getTaskById(id));
+    }
+
+    @Override
+    public Set<TaskRecordDTO> getAllTasks(){
+        List<Task> tasks = taskRepository.findAll();
+        Set<TaskRecordDTO>  taskRecords = tasks
+                .stream()
+                .map(task -> new TaskRecordDTO(task.getId(), task.getTitle(), task.getDescription(), task.getStatus(), task.getUser())).collect(Collectors.toSet());
+        return taskRecords;
     }
 
     @Override
@@ -46,8 +63,11 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.deleteById(id);
     }
 
+    //Validations
+
     @Override
     public Task getTaskById(Long id) throws NotFoundException {
+
         return taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
@@ -59,6 +79,24 @@ public class TaskServiceImpl implements TaskService {
     public void checkIfTaskExistsById(Long id) throws NotFoundException {
         if(!userRepository.existsById(id)) {
             throw new NotFoundException("User does not exists");
+        }
+    }
+
+    public void checkIfUserHasPermissionForTask(Long taskId) throws NotFoundException {
+        Task task = getTaskById(taskId);
+
+        // Retrieve the current authentication from the Security Context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        UserEntity currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
+
+        // Check admin role (adjust based on your setup)
+        boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().toString().equals("ADMIN");
+
+        if (!task.getUser().getId().equals(currentUser.getId()) && !isAdmin) {
+            throw new NotFoundException("Task not found");
         }
     }
 }
