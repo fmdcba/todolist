@@ -17,7 +17,7 @@ public class UserEntity {
 
     private String password;
 
-    private RoleType role = RoleType.USER;
+    private RoleType role;
 
     @Column(unique = true)
     private String email;
@@ -27,10 +27,11 @@ public class UserEntity {
 
     public UserEntity() {}
 
-    public UserEntity(String username, String password, String email) {
+    public UserEntity(String username, String password, String email, RoleType role) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
     }
 
     public Long getId() {
