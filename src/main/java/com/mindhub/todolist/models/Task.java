@@ -1,5 +1,6 @@
 package com.mindhub.todolist.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -61,6 +62,7 @@ public class Task {
         this.status = status;
     }
 
+    @JsonIgnore
     public UserEntity getUser() {
         return user;
     }
