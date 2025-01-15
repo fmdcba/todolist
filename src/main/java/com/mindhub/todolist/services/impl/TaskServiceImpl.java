@@ -4,6 +4,7 @@ import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
 import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.TaskRepository;
@@ -27,8 +28,9 @@ public class TaskServiceImpl implements TaskService {
     private UserRepository userRepository;
 
     @Override
-    public TaskDTO getTaskDTOById(Long id) throws NotFoundException {
+    public TaskDTO getTaskDTOById(Long id) throws UnauthorizedException, NotFoundException {
         checkIfUserHasPermissionForTask(id);
+
         return new TaskDTO(getTaskById(id));
     }
 
@@ -49,17 +51,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateTask(NewTaskDTO updatedTask, Long id) throws NotFoundException {
+    public void updateTask(NewTaskDTO updatedTask, Long id) throws  UnauthorizedException, NotFoundException {
         Task task = getTaskById(id);
-        //TODO: Fix validation messages for patch, should say something like: "No input data" o change for PUT
-        // validateTask(updatedTask);
+        checkIfUserHasPermissionForTask(id);
 
         saveTask(task);
     }
 
     @Override
-    public void deleteTask(Long id) {
-        // TODO: Add validations if task does not exist
+    public void deleteTask(Long id) throws NotFoundException, UnauthorizedException {
+        getTaskById(id);
+        checkIfUserHasPermissionForTask(id);
         taskRepository.deleteById(id);
     }
 
@@ -82,21 +84,19 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    public void checkIfUserHasPermissionForTask(Long taskId) throws NotFoundException {
+    public void checkIfUserHasPermissionForTask(Long taskId) throws UnauthorizedException, NotFoundException {
         Task task = getTaskById(taskId);
 
-        // Retrieve the current authentication from the Security Context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserEmail = authentication.getName();
 
         UserEntity currentUser = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
 
-        // Check admin role (adjust based on your setup)
         boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().toString().equals("ADMIN");
 
         if (!task.getUser().getId().equals(currentUser.getId()) && !isAdmin) {
-            throw new NotFoundException("Task not found");
+            throw new UnauthorizedException("Unauthorized");
         }
     }
 }

@@ -7,21 +7,22 @@ import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.UserEntity;
 
 import java.util.Set;
 
 public interface UserService {
 
-    UserDTO getUserDTOById(Long id) throws NotFoundException, InvalidArgumentException;
+    UserDTO getUserDTOById(Long id) throws NotFoundException, InvalidArgumentException, UnauthorizedException;
 
     void createUser(NewUserDTO user) throws InvalidArgumentException, AlreadyExistsException;
 
     void createAdmin (NewUserDTO user) throws InvalidArgumentException, AlreadyExistsException;
 
-    void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException;
+    void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException, UnauthorizedException;
 
-    void deleteUser(Long id) throws InvalidArgumentException, NotFoundException;
+    void deleteUser(Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedException;
 
     UserEntity getUserById(Long id) throws NotFoundException;
 
@@ -29,7 +30,7 @@ public interface UserService {
 
     Set<UserRecordDTO> getAllUsers();
 
-    //TODO: move business logic validations methods here
+    void checkIfUserHasPermission(Long userId) throws UnauthorizedException, NotFoundException;
 
     void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException;
 

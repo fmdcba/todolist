@@ -6,11 +6,15 @@ import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.RoleType;
+import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +32,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDTO getUserDTOById(Long id) throws NotFoundException {
+    public UserDTO getUserDTOById(Long id) throws NotFoundException, UnauthorizedException {
+        checkIfUserHasPermission(id);
 
         return new UserDTO(getUserById(id));
     }
@@ -59,16 +64,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException {
-        UserEntity user = getUserById(id);
+    public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, UnauthorizedException {
         checkIfUserExists(updatedUser);
+        checkIfUserHasPermission(id);
+
+        UserEntity user = getUserById(id);
 
         saveUser(user);
     }
 
     @Override
-    public void deleteUser(Long id) throws NotFoundException {
+    public void deleteUser(Long id) throws NotFoundException, UnauthorizedException {
         checkIfUserExistsById(id);
+        checkIfUserHasPermission(id);
 
         userRepository.deleteById(id);
     }
@@ -98,6 +106,22 @@ public class UserServiceImpl implements UserService {
     public void checkIfUserExistsById(Long id) throws NotFoundException {
         if(!userRepository.existsById(id)) {
             throw new NotFoundException("User does not exists");
+        }
+    }
+
+    public void checkIfUserHasPermission(Long userId) throws UnauthorizedException, NotFoundException  {
+        UserEntity user = getUserById(userId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        UserEntity currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
+
+        boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().toString().equals("ADMIN");
+
+        if (!user.getId().equals(currentUser.getId()) && !isAdmin) {
+            throw new UnauthorizedException("Unauthorized");
         }
     }
 }
