@@ -2,23 +2,16 @@ package com.mindhub.todolist.controllers;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
-import com.mindhub.todolist.dtos.TaskRecordDTO;
-import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
-import com.mindhub.todolist.models.UserEntity;
+import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
@@ -31,7 +24,7 @@ public class TaskController {
     @Operation(summary = "Get a task", description = "Return a task and it's attributes")
         @ApiResponse(responseCode = "200", description = "Return the task with a status code of OK")
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
-    public TaskDTO getTask(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
+    public TaskDTO getTask(@PathVariable long id) throws NotFoundException, InvalidArgumentException, UnauthorizedException {
         validateId(id);
         return taskService.getTaskDTOById(id);
     }
@@ -50,11 +43,11 @@ public class TaskController {
     @Operation(summary = "Edit a Task", description = "Edit a task or any of it's field")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: Task updated")
         @ApiResponse(responseCode = "404", description = "When trying to patch non existent task. Confirmation msg on body: Task not found")
-    public ResponseEntity<?> updateTask(@RequestBody NewTaskDTO updatedTask, @PathVariable Long id) throws NotFoundException, InvalidArgumentException {
+    public ResponseEntity<?> updateTask(@RequestBody NewTaskDTO updatedTask, @PathVariable Long id) throws NotFoundException, InvalidArgumentException, UnauthorizedException {
         validateId(id);
+        checkEmptyData(updatedTask);
         taskService.updateTask(updatedTask, id);
-        //TODO: data validation not working on patch, consider change for PUT
-        //checkEmptyData(updatedTask);
+
         return new ResponseEntity<>("Task updated", HttpStatus.OK);
     }
 
@@ -62,13 +55,12 @@ public class TaskController {
     @Operation(summary = "Delete a task", description = "Deletes a task")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: Task deleted")
         @ApiResponse(responseCode = "400", description = "When trying to delete a task with invalid ID. Confimations msg on body: invalid ID")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) throws InvalidArgumentException {
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) throws InvalidArgumentException, UnauthorizedException, NotFoundException {
         validateId(id);
         taskService.deleteTask(id);
         return new ResponseEntity<>("Task deleted", HttpStatus.OK);
     }
 
-    // TODO: Consider extract this method DRY! the two services use the same syntax.
     public void validateId(Long id) throws InvalidArgumentException {
         if (id == null  || id <= 0) {
             throw new InvalidArgumentException("Invalid ID");
@@ -84,7 +76,6 @@ public class TaskController {
             throw new InvalidArgumentException("Task description must not be null or empty");
         }
 
-        // TODO: Find better validations for this arguments
         if (newTask.status() == null) {
             throw new InvalidArgumentException("Status must not be null or empty");
         }
@@ -94,9 +85,9 @@ public class TaskController {
         }
     }
 
-//    public void checkEmptyData(NewTaskDTO newTask) throws InvalidArgumentException {
-//        if (newTask.title() == null || newTask.title().isBlank() || newTask.description() == null || newTask.description().isBlank() || newTask.status() == null || newTask.user() == null) {
-//            throw new InvalidArgumentException("Task must not be null or empty");
-//        }
-//    }
+    public void checkEmptyData(NewTaskDTO newTask) throws InvalidArgumentException {
+        if (newTask.title() == null && newTask.description() == null && newTask.status() == null && newTask.user() == null) {
+            throw new InvalidArgumentException("When editing task must not be null or empty");
+        }
+    }
 }

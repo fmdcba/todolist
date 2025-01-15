@@ -4,7 +4,6 @@ import com.mindhub.todolist.dtos.LoginUserDTO;
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
-import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +35,9 @@ public class AuthController {
     private JwtUtils jwtUtil;
 
     @PostMapping("/login")
+    @Operation(summary = "Log in", description = "Login a user and return a JTW in plain text")
+    @ApiResponse(responseCode = "200", description = "Confirmation msg on body: User created")
+    @ApiResponse(responseCode = "403", description = "Invalid Credentials")
     public ResponseEntity<String> authenticateUser(@RequestBody LoginUserDTO loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -49,8 +51,9 @@ public class AuthController {
         return ResponseEntity.ok(jwt);
     }
 
+
     @PostMapping("/register")
-    @Operation(summary = "Create user", description = "Recieves a user, posts it and return a confirmation message")
+    @Operation(summary = "Sign in", description = "Receives credential for a user in the body and return a confirmation message")
     @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
     @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO) throws AlreadyExistsException, InvalidArgumentException {

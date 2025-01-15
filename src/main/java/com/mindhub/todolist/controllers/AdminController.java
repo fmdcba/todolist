@@ -7,7 +7,6 @@ import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.models.UserEntity;
-import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.TaskService;
 import com.mindhub.todolist.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -24,7 +22,6 @@ import java.util.Set;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-
     @Autowired
     private UserService userService;
 
@@ -32,7 +29,7 @@ public class AdminController {
     private TaskService taskService;
 
     @GetMapping("/user/{id}")
-    @Operation(summary = "Get user", description = "Return one user and it's attributes")
+    @Operation(summary = "Get user", description = "Return one user in particular and it's attributes")
     @ApiResponse(responseCode = "200", description = "Return the user with a status code of OK")
     @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
     public ResponseEntity<?> getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
@@ -41,7 +38,7 @@ public class AdminController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/user/all")
     @Operation(summary = "Get all users", description = "Returns all users and their attributes")
     @ApiResponse(responseCode = "200", description = "Returns a collection of all users")
     public ResponseEntity<Set<UserRecordDTO>> getAllUsers() {
@@ -49,7 +46,7 @@ public class AdminController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/task/all")
     @Operation(summary = "Get all tasks", description = "Returns all tasks and their attributes")
     @ApiResponse(responseCode = "200", description = "Returns a collection of all tasks")
     public ResponseEntity<Set<TaskRecordDTO>> getAllTasks() {
@@ -59,16 +56,13 @@ public class AdminController {
 
     @PostMapping
     @Operation(summary = "Create admin", description = "Recieves an admin, posts it and return a confirmation message")
-    @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
+    @ApiResponse(responseCode = "201", description = "confirmation msg on body: Admin created")
     @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> createAdmin(@RequestBody NewUserDTO newUserDTO) throws AlreadyExistsException, InvalidArgumentException {
         validateAdmin(newUserDTO);
         userService.createAdmin(newUserDTO);
         return new ResponseEntity<>("Admin created", HttpStatus.CREATED);
     }
-
-
-
 
     // Validations
 
