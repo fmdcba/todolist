@@ -7,13 +7,404 @@
 	},
 	"item": [
 		{
-			"name": "User",
+			"name": "Auth",
 			"item": [
 				{
-					"name": "Get user by ID",
+					"name": "Register User",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"newuser\", \"password\": \"newuser123\", \"email\": \"new@user.com\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/api/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"JWT\", pm.response.text())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"pepe@pepe.com\",\r\n    \"password\" : \"pepe123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/api/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"JWT\", pm.response.text())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"admin@admin.com\",\r\n    \"password\" : \"admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/api/auth/login"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UserCRUD",
+			"item": [
+				{
+					"name": "UserExceptions",
+					"item": [
+						{
+							"name": "Get User With Invalid ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Non Existent User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "55"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User With Other ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User Without Username",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"username\": \"\", \"password\": \"juan123\", \"email\": \"pipo@pepe.com\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/api/user"
+							},
+							"response": []
+						},
+						{
+							"name": "Create User With Used Email",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"username\": \"toti\", \"password\": \"juani123\", \"email\": \"pepo@pepe.com\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/api/user"
+							},
+							"response": []
+						},
+						{
+							"name": "Patch Non Existent User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"username\":\"mengano\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Patch User With Other ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User With Invalid ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User With Other ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"url": {
 							"raw": "localhost:8080/api/user/:id",
 							"host": [
@@ -36,8 +427,14 @@
 					"response": []
 				},
 				{
-					"name": "Create new user",
+					"name": "Create User",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -54,7 +451,7 @@
 					"response": []
 				},
 				{
-					"name": "Edit user",
+					"name": "UpdateUser",
 					"request": {
 						"method": "PATCH",
 						"header": [],
@@ -89,7 +486,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete user by ID",
+					"name": "DeleteUser",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -113,27 +510,68 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "AdminCRUD",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/api/admin/user/all"
+					},
+					"response": []
 				},
 				{
-					"name": "Try get user with invalid id",
+					"name": "Get All Tasks",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/api/task/all"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Other User Task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/task/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"task",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "-1"
+									"value": "1"
 								}
 							]
 						}
@@ -141,10 +579,49 @@
 					"response": []
 				},
 				{
-					"name": "Try get inexistent user",
+					"name": "Create Admin",
 					"request": {
-						"method": "GET",
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"admin2\", \"password\": \"admin1234\", \"email\": \"admin2@admin.com\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/api/admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Patch Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"admin3\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "localhost:8080/api/user/:id",
 							"host": [
@@ -167,44 +644,14 @@
 					"response": []
 				},
 				{
-					"name": "Try creating user without username",
+					"name": "Delete User As Admin",
 					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"\", \"password\": \"juan123\", \"email\": \"pipo@pepe.com\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
 							}
 						},
-						"url": "localhost:8080/api/user"
-					},
-					"response": []
-				},
-				{
-					"name": "Try creating user with used email",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"toti\", \"password\": \"juani123\", \"email\": \"pepo@pepe.com\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "localhost:8080/api/user"
-					},
-					"response": []
-				},
-				{
-					"name": "Try deleting user with invalid id",
-					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -221,7 +668,39 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "-2"
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/user/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5"
 								}
 							]
 						}
@@ -231,11 +710,329 @@
 			]
 		},
 		{
-			"name": "Task",
+			"name": "TaskCRUD",
 			"item": [
 				{
-					"name": "Get task by ID",
+					"name": "Task Exceptions",
+					"item": [
+						{
+							"name": "Get Task With Invalid ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Task With Inexistent ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task Without Title",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"title\": \"\", \"description\": \"Cazuela de mariscos\", \"status\": \"IN_PROGRESS\", \r\n    \"user\": {\r\n        \"id\": 1, \"username\": \"pepe\", \"email\": \"pepe@pepe.com\"\r\n    }\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/api/task"
+							},
+							"response": []
+						},
+						{
+							"name": "Patch Non Existent Task",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Task With Invalid ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Patch Task Without Data",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Patch other user task",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"title\": \"salir a correr\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get other user task",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete other user task",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/task/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"task",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Task",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -252,7 +1049,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -266,7 +1063,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"title\": \"Preparar la cena\", \"description\": \"Cazuela de mariscos\", \"status\": \"IN_PROGRESS\", \r\n    \"user\": {\r\n        \"id\": 1\r\n    }\r\n}\r\n",
+							"raw": "{\r\n  \"title\": \"Finish Homework\",\r\n  \"description\": \"Complete the homework for the Spring Boot course\",\r\n  \"status\": \"PENDING\",\r\n  \"user\": {\r\n    \"id\": 1\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -280,6 +1077,12 @@
 				{
 					"name": "Edit task",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "PATCH",
 						"header": [],
 						"body": {
@@ -317,175 +1120,6 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/task/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"task",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try get task with invalid ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/task/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"task",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "-2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to get task with inexistent ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/task/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"task",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "1000"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to create task without title",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"title\": \"\", \"description\": \"Cazuela de mariscos\", \"status\": \"IN_PROGRESS\", \r\n    \"user\": {\r\n        \"id\": 1, \"username\": \"pepe\", \"email\": \"pepe@pepe.com\"\r\n    }\r\n}\r\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "localhost:8080/api/task"
-					},
-					"response": []
-				},
-				{
-					"name": "Try to patch inexisten task",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"title\": \"Ir a Pilates\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/api/task/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"task",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "5"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try deleting invalid id",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/task/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"task",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "-1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Try to patch data without data",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "localhost:8080/api/task/:id",
 							"host": [

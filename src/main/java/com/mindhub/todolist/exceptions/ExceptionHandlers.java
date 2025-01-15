@@ -22,4 +22,9 @@ public class ExceptionHandlers {
     public ResponseEntity<String> handleAlreadyExistsException(AlreadyExistsException alreadyExistsException) {
         return new ResponseEntity<>(alreadyExistsException.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handeUnauthorized(UnauthorizedException unauthorizedException) {
+        return new ResponseEntity<>(unauthorizedException.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
