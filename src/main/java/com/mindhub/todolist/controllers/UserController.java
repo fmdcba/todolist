@@ -2,9 +2,12 @@ package com.mindhub.todolist.controllers;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
+import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.models.UserEntity;
+import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/user")
@@ -24,9 +29,10 @@ public class UserController {
     @Operation(summary = "Get user", description = "Return a user and it's attributes")
         @ApiResponse(responseCode = "200", description = "Return the user with a status code of OK")
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
-    public UserDTO getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
+    public ResponseEntity<?> getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException {
         validateId(id);
-        return userService.getUserDTOById(id);
+        UserEntity user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping

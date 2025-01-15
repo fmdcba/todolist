@@ -2,15 +2,23 @@ package com.mindhub.todolist.controllers;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
+import com.mindhub.todolist.dtos.TaskRecordDTO;
+import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
@@ -86,9 +94,9 @@ public class TaskController {
         }
     }
 
-    //public void checkEmptyData(NewTaskDTO newTask) throws InvalidArgumentException {
-    //    if (newTask.title() == null || newTask.title().isBlank() && newTask.description() == null || newTask.description().isBlank() && newTask.status() == null && newTask.user() == null) {
-    //        throw new InvalidArgumentException("Task must not be null or empty");
-    //    }
-    //}
+//    public void checkEmptyData(NewTaskDTO newTask) throws InvalidArgumentException {
+//        if (newTask.title() == null || newTask.title().isBlank() || newTask.description() == null || newTask.description().isBlank() || newTask.status() == null || newTask.user() == null) {
+//            throw new InvalidArgumentException("Task must not be null or empty");
+//        }
+//    }
 }
