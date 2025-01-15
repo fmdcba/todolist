@@ -30,10 +30,12 @@ public class TodolistApplication {
 			UserEntity user1 = new UserEntity("fulano", passwordEncoder.encode("fulano123"), "fulano@fulano.com", RoleType.USER);
 			UserEntity user2 = new UserEntity("juan", passwordEncoder.encode("juan123"), "juan@juan.com", RoleType.USER);
 			UserEntity user3 = new UserEntity("admin", passwordEncoder.encode("admin123"), "admin@admin.com", RoleType.ADMIN);
+			UserEntity user4 = new UserEntity("admin2", passwordEncoder.encode("admin1233"), "admin2@admin.com", RoleType.ADMIN);
 			userRepository.save(user);
 			userRepository.save(user1);
 			userRepository.save(user2);
 			userRepository.save(user3);
+			userRepository.save(user4);
 			Task task1 = new Task("Ir al gym", "Hacer rutina de piernas", Task.TaskStatus.PENDING, user);
 			Task task2 = new Task("Desayunar", "Huevos revueltos", Task.TaskStatus.COMPLETED, user1);
 			taskRepository.save(task1);
