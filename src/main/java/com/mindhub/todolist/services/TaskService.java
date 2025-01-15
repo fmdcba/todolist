@@ -14,7 +14,7 @@ public interface TaskService {
 
     TaskDTO getTaskDTOById(Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
 
-    TaskDTO createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
+    void createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
 
     void updateTask(NewTaskDTO updatedTask, Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
 

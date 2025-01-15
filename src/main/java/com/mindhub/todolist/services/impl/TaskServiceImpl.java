@@ -47,8 +47,7 @@ public class TaskServiceImpl implements TaskService {
     public void createTask(NewTaskDTO newTask) throws NotFoundException {
         Task task = new Task(newTask.title(), newTask.description(), newTask.status(), newTask.user());
         checkIfTaskExistsById(newTask.user().getId());
-        Task savedTask = saveTask(task);
-        return new TaskDTO(savedTask);
+        saveTask(task);
     }
 
     @Override
