@@ -1,14 +1,12 @@
 package com.mindhub.todolist.services.impl;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
-import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.dtos.UserRecordDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.RoleType;
-import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
@@ -32,27 +30,43 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDTO getUserDTOById(Long id) throws NotFoundException, UnauthorizedException {
-        checkIfUserHasPermission(id);
+    public UserDTO getUser(Long id, String authority, String userEmail) throws NotFoundException, UnauthorizedException {
+
+        if (authority.equals("[USER]")){
+            isUserId(id, userEmail);
+        }
 
         return new UserDTO(getUserById(id));
     }
 
     @Override
-    public Set<UserRecordDTO> getAllUsers(){
-        List<UserEntity> users = userRepository.findAll();
-        Set<UserRecordDTO>  userRecords = users
-                .stream()
-                .map(userEntity -> new UserRecordDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getRole())).collect(Collectors.toSet());
-        return userRecords;
+    public Set<UserRecordDTO> getAllUsers(String role) {
+        try {
+            isAdmin(role);
+
+            List<UserEntity> users = userRepository.findAll();
+            Set<UserRecordDTO>  userRecords = users
+                    .stream()
+                    .map(userEntity -> new UserRecordDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getRole())).collect(Collectors.toSet());
+            return userRecords;
+        } catch (UnauthorizedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void createUser(NewUserDTO newUser) throws AlreadyExistsException {
+    public void createUser(NewUserDTO newUser,String role) throws AlreadyExistsException {
         checkIfUserExists(newUser);
-        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), RoleType.USER);
+        // Add validation for fields;
 
-        saveUser(user);
+        try {
+            isAdmin(role);
+            UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), (RoleType) newUser.role());
+
+            saveUser(user);
+        } catch (UnauthorizedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -79,6 +93,14 @@ public class UserServiceImpl implements UserService {
         checkIfUserHasPermission(id);
 
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public void registerUser(NewUserDTO newUser) throws AlreadyExistsException {
+        checkIfUserExists(newUser);
+        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), RoleType.USER);
+
+        saveUser(user);
     }
 
     // Validations
@@ -124,4 +146,20 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException("Unauthorized");
         }
     }
+
+    public void isUserId(Long id, String email) throws NotFoundException, UnauthorizedException {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Not found"));
+
+        if(!user.getEmail().equals(email)) {
+            throw new UnauthorizedException("Unauthorized");
+        }
+    }
+
+    public void isAdmin(String role) throws UnauthorizedException {
+        if (!role.equals("[ADMIN]")){
+            throw new UnauthorizedException("Unauthorized");
+        }
+    }
 }
+

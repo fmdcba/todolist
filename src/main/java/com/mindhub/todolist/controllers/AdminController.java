@@ -38,13 +38,13 @@ public class AdminController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @GetMapping("/user/all")
-    @Operation(summary = "Get all users", description = "Returns all users and their attributes")
-    @ApiResponse(responseCode = "200", description = "Returns a collection of all users")
-    public ResponseEntity<Set<UserRecordDTO>> getAllUsers() {
-        Set<UserRecordDTO> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
+//    @GetMapping("/user/all")
+//    @Operation(summary = "Get all users", description = "Returns all users and their attributes")
+//    @ApiResponse(responseCode = "200", description = "Returns a collection of all users")
+//    public ResponseEntity<Set<UserRecordDTO>> getAllUsers() {
+//        Set<UserRecordDTO> users = userService.getAllUsers();
+//        return new ResponseEntity<>(users, HttpStatus.OK);
+//    }
 
     @GetMapping("/task/all")
     @Operation(summary = "Get all tasks", description = "Returns all tasks and their attributes")
