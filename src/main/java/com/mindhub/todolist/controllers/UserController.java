@@ -4,6 +4,7 @@ import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.exceptions.*;
 import com.mindhub.todolist.services.UserService;
+import com.mindhub.todolist.utils.ControllerValidations;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ControllerValidations controllerValidations;
+
     @GetMapping("/{id}")
     @Operation(summary = "Get user by id", description = "If logged as user, return only if it is its own id. If logged as Admin returns any user")
         @ApiResponse(responseCode = "200", description = "Return user data, and http code status OK")
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
         @ApiResponse(responseCode = "401", description = "Error msg Unauthorized trying to get other users ID with user role")
-    public UserDTO getUser(@PathVariable long id, Authentication authentication) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException {
-        validateId(id);
-        String authUserEmail = getAuthenticatedUserEmail(authentication);
+    public UserDTO getUser(@PathVariable long id) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException {
+        controllerValidations.validateId(id);
+        String authUserEmail = controllerValidations.getAuthUserEmail();
 
         return userService.getUser(authUserEmail, id);
     }
@@ -37,8 +41,8 @@ public class UserController {
     @Operation(summary = "Get all users", description = "Returns all users if logged as admin")
     @ApiResponse(responseCode = "200", description = "Returns a collection of all users")
     @ApiResponse(responseCode = "401", description = "Error msg Unauthorized when trying to get all users with user role")
-    public ResponseEntity<?> getAllUsers(Authentication authentication) throws NotFoundException, UnauthorizedAccessException {
-        String authUserEmail = getAuthenticatedUserEmail(authentication);
+    public ResponseEntity<?> getAllUsers() throws NotFoundException, UnauthorizedAccessException {
+        String authUserEmail = controllerValidations.getAuthUserEmail();
 
         List<UserDTO> users = userService.getAllUsers(authUserEmail);
         return new ResponseEntity<>(users, HttpStatus.OK);
@@ -49,73 +53,40 @@ public class UserController {
         @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
         @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO, Authentication authentication) throws AlreadyExistsException, InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
-        // validateEntries()
-        validateUser(newUserDTO); // erase
-        String authUserEmail = getAuthenticatedUserEmail(authentication);
+        controllerValidations.validateEntries(newUserDTO);
+        String authUserEmail = controllerValidations.getAuthUserEmail();
 
         userService.createUser(newUserDTO, authUserEmail);
-        return new ResponseEntity<>("User created succefully.", HttpStatus.CREATED);
+        return new ResponseEntity<>("User created successfully.", HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Edit user", description = "Edit a user or any of it's field")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: User updated")
         @ApiResponse(responseCode = "404", description = "When trying to patch non existent user. Confirmation msg on body: user not found")
-    public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser, Authentication authentication, @PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException, UnauthorizedAccessException {
-        validateId(id);
-        validateEntries(updatedUser);
-        String authUserEmail = getAuthenticatedUserEmail(authentication);
+    public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser, @PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException, UnauthorizedAccessException {
+        controllerValidations.validateId(id);
+        validateEntriesUpdate(updatedUser);
+        String authUserEmail = controllerValidations.getAuthUserEmail();
 
         userService.updateUser(updatedUser, authUserEmail, id);
-        return new ResponseEntity<>("updated user", HttpStatus.OK);
+        return new ResponseEntity<>("User updated successfully.", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user", description = "Deletes a user")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: User deleted")
         @ApiResponse(responseCode = "400", description = "When trying to delete a user with invalid ID. Confimations msg on body: invalid ID")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
-        validateId(id);
-        String authUserEmail = getAuthenticatedUserEmail(authentication);
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
+        controllerValidations.validateId(id);
+        String authUserEmail = controllerValidations.getAuthUserEmail();
 
         userService.deleteUser(authUserEmail, id);
-        return new ResponseEntity<>("deleted user", HttpStatus.OK);
+        return new ResponseEntity<>("User deleted successfully.", HttpStatus.OK);
     }
 
-    //
-
-    public void validateId(Long id) throws InvalidArgumentException {
-        if (id == null  || id <= 0) {
-            throw new InvalidArgumentException("Invalid ID");
-        }
-    }
-
-    public void validateUser(NewUserDTO newUser) throws InvalidArgumentException {
-        if (newUser.username() == null || newUser.username().isBlank()) {
-            throw new InvalidArgumentException("Username must not be null or empty");
-        }
-
-        if (newUser.email() == null || newUser.email().isBlank()) {
-            throw new InvalidArgumentException("Email must not be null or empty");
-        }
-
-        if (newUser.password() == null || newUser.password().isBlank()) {
-            throw new InvalidArgumentException("Password must not be null or empty");
-        }
-    }
-
-
-    public String getAuthenticatedUserEmail(Authentication authentication){
-        return authentication.getName();
-    }
-
-    public void validateEntries(NewUserDTO user) throws InvalidArgumentException {
-        if (user.username() == null || user.username().isBlank()) {
-            throw new InvalidArgumentException("Username must not be null or empty");
-        }
-
-        if (user.password() == null || user.password().isBlank()) {
-            throw new InvalidArgumentException("Password must not be null or empty");
-        }
+    public void validateEntriesUpdate(NewUserDTO newUserDTO) throws InvalidArgumentException {
+        controllerValidations.validateUsername(newUserDTO.username());
+        controllerValidations.validatePassword(newUserDTO.password());
     }
 }
