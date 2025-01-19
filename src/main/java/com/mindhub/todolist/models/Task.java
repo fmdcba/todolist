@@ -67,6 +67,10 @@ public class Task {
         return user;
     }
 
+    public Long getUserId() {
+        return user.getId();
+    }
+
     public void setUser(UserEntity user) {
         this.user = user;
     }

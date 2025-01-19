@@ -5,28 +5,22 @@ import com.mindhub.todolist.dtos.TaskDTO;
 import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
+import com.mindhub.todolist.exceptions.UnauthorizedAccessException;
 import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.Task;
 
+import java.util.List;
 import java.util.Set;
 
-public interface TaskService extends GenericService {
+public interface TaskService extends GenericService<Task> {
 
-    TaskDTO getTask(Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
+    TaskDTO getTask(String authUserEmail, Long id) throws  NotFoundException, InvalidArgumentException, UnauthorizedAccessException;
 
-    void createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
+    List<TaskDTO> getAllTasks(String authUserEmail) throws NotFoundException, UnauthorizedAccessException;
 
-    void updateTask(NewTaskDTO updatedTask, Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
+    void createTask(NewTaskDTO task, String authUserEmail) throws InvalidArgumentException, NotFoundException;
 
-    void deleteTask(Long id) throws InvalidArgumentException, UnauthorizedException, NotFoundException;
+    void updateTask(NewTaskDTO updatedTask, String authUserEmail, Long id) throws  NotFoundException, InvalidArgumentException, UnauthorizedAccessException;
 
-    Task getTaskById(Long id) throws NotFoundException;
-
-    Task saveTask(Task newTask);
-
-    Set<TaskRecordDTO> getAllTasks();
-
-    void checkIfTaskExistsById (Long id) throws NotFoundException;
-
-    void checkIfUserHasPermissionForTask(Long taskId) throws UnauthorizedException, NotFoundException;
+    void deleteTask(String authUserEmail, Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException;
 }
