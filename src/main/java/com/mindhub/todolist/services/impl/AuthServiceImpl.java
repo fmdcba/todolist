@@ -1,6 +1,6 @@
 package com.mindhub.todolist.services.impl;
 
-import com.mindhub.todolist.Mappers.UserMapper;
+import com.mindhub.todolist.mappers.UserMapper;
 import com.mindhub.todolist.config.JwtUtils;
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.exceptions.AlreadyExistsException;
