@@ -41,7 +41,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ,"/h2-console/**").permitAll()
                                 .requestMatchers( "/api/auth/**").permitAll()
-                                .requestMatchers("/api/user/**", "/api/task/**").hasAnyAuthority("USER", "ADMIN")
+                                .requestMatchers("/api/users/**", "/api/tasks/**").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest().denyAll() // All other requests must be authenticated
                 )

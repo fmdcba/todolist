@@ -23,8 +23,9 @@ public class ExceptionHandlers {
         return new ResponseEntity<>(alreadyExistsException.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<String> handeUnauthorized(UnauthorizedException unauthorizedException) {
-        return new ResponseEntity<>(unauthorizedException.getMessage(), HttpStatus.UNAUTHORIZED);
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<String> UnauthorizedAccessException(UnauthorizedAccessException unauthorizedAccessException) {
+        return new ResponseEntity<>(unauthorizedAccessException.getMessage(), HttpStatus.UNAUTHORIZED);
     }
+
 }

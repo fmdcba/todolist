@@ -38,8 +38,10 @@ public class TodolistApplication {
 			userRepository.save(user4);
 			Task task1 = new Task("Ir al gym", "Hacer rutina de piernas", Task.TaskStatus.PENDING, user);
 			Task task2 = new Task("Desayunar", "Huevos revueltos", Task.TaskStatus.COMPLETED, user1);
+			Task task3 = new Task("Desayunar", "Huevos revueltos", Task.TaskStatus.PENDING, user3);
 			taskRepository.save(task1);
 			taskRepository.save(task2);
+			taskRepository.save(task3);
 		};
 	}
 }
