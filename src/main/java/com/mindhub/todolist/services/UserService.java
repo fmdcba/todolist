@@ -3,42 +3,34 @@ package com.mindhub.todolist.services;
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.dtos.UserRecordDTO;
-import com.mindhub.todolist.exceptions.AlreadyExistsException;
-import com.mindhub.todolist.exceptions.InvalidArgumentException;
-import com.mindhub.todolist.exceptions.NotFoundException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
+import com.mindhub.todolist.exceptions.*;
 import com.mindhub.todolist.models.UserEntity;
 import org.springframework.security.core.Authentication;
 
+import java.util.List;
 import java.util.Set;
 
-public interface UserService {
+public interface UserService extends GenericService<UserEntity> {
 
-    UserDTO getUser(Long id, String auth, String email) throws NotFoundException, InvalidArgumentException, UnauthorizedException;
+    UserDTO getUser(String email, Long id) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException;
 
-    void createUser(NewUserDTO user, String role) throws InvalidArgumentException, AlreadyExistsException;
+    void createUser(NewUserDTO user, String role) throws InvalidArgumentException, AlreadyExistsException, NotFoundException, UnauthorizedAccessException;
 
-    void createAdmin (NewUserDTO user) throws InvalidArgumentException, AlreadyExistsException;
+    void updateUser(NewUserDTO updatedUser, String email, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException, UnauthorizedAccessException;
 
-    void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException, UnauthorizedException;
-
-    void deleteUser(Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedException;
+    void deleteUser(String authUserEmail, Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException;
 
     UserEntity getUserById(Long id) throws NotFoundException;
 
     UserEntity saveUser(UserEntity newUser);
 
-    Set<UserRecordDTO> getAllUsers(String role) throws UnauthorizedException;
+    List<UserDTO> getAllUsers(String role) throws NotFoundException, UnauthorizedAccessException;
 
     void registerUser(NewUserDTO newUser) throws AlreadyExistsException;
 
-    void checkIfUserHasPermission(Long userId) throws UnauthorizedException, NotFoundException;
-
     void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException;
 
-    void checkIfUserExistsById(Long id) throws NotFoundException;
+    void validateAlreadyExistsEmail(String email) throws AlreadyExistsException;
 
-    void isUserId(Long id, String email) throws NotFoundException, UnauthorizedException;
-
-    void isAdmin(String role) throws UnauthorizedException;
+    void validateIsAuthorized(UserEntity authUser, Long id) throws UnauthorizedAccessException;
 }

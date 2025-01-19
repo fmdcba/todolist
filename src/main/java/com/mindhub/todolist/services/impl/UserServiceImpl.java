@@ -1,15 +1,15 @@
 package com.mindhub.todolist.services.impl;
 
+import com.mindhub.todolist.Mappers.UserMapper;
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.dtos.UserRecordDTO;
-import com.mindhub.todolist.exceptions.AlreadyExistsException;
-import com.mindhub.todolist.exceptions.NotFoundException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
+import com.mindhub.todolist.exceptions.*;
 import com.mindhub.todolist.models.RoleType;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,71 +29,65 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Override
-    public UserDTO getUser(Long id, String authority, String userEmail) throws NotFoundException, UnauthorizedException {
+    @Autowired
+    private UserMapper userMapper;
 
-        if (authority.equals("[USER]")){
-            isUserId(id, userEmail);
+    @Override
+    public UserDTO getUser(String authUserEmail, Long id) throws NotFoundException, UnauthorizedAccessException {
+        UserEntity authUser = getAuthenticatedUser(authUserEmail);
+
+        validateExistsId(id);
+        validateIsAuthorized(authUser, id);
+
+        return userMapper.userToDTO(findById(id));
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers(String authUserEmail) throws NotFoundException,  UnauthorizedAccessException {
+        UserEntity authUser = getAuthenticatedUser(authUserEmail);
+
+        validateIsAdmin(authUser);
+
+        return userMapper.usersListToDTO(findAll());
+    }
+
+    @Override
+    public void createUser(NewUserDTO newUser, String authUserEmail) throws AlreadyExistsException, NotFoundException, UnauthorizedAccessException {
+        UserEntity authUser = getAuthenticatedUser(authUserEmail);
+
+        validateAlreadyExistsEmail(newUser.email());
+        validateIsAdmin(authUser);
+
+        save(userMapper.userToEntity(newUser));
+    }
+
+    @Override
+    public void updateUser(NewUserDTO updatedUser, String authUserEmail, Long id) throws NotFoundException, AlreadyExistsException, UnauthorizedAccessException {
+        UserEntity authUser = getAuthenticatedUser(authUserEmail);
+
+        validateExistsId(id);
+        validateIsAuthorized(authUser, id);
+        if(!validateIsUserId(authUser, id)){
+            validateAlreadyExistsEmail(updatedUser.email());
+            validateAlreadyExistsUsername(updatedUser.username());
         }
-
-        return new UserDTO(getUserById(id));
-    }
-
-    @Override
-    public Set<UserRecordDTO> getAllUsers(String role) {
-        try {
-            isAdmin(role);
-
-            List<UserEntity> users = userRepository.findAll();
-            Set<UserRecordDTO>  userRecords = users
-                    .stream()
-                    .map(userEntity -> new UserRecordDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getRole())).collect(Collectors.toSet());
-            return userRecords;
-        } catch (UnauthorizedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void createUser(NewUserDTO newUser,String role) throws AlreadyExistsException {
-        checkIfUserExists(newUser);
-        // Add validation for fields;
-
-        try {
-            isAdmin(role);
-            UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), (RoleType) newUser.role());
-
-            saveUser(user);
-        } catch (UnauthorizedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void createAdmin(NewUserDTO newUser) throws AlreadyExistsException {
-        checkIfUserExists(newUser);
-        UserEntity user = new UserEntity(newUser.username(), passwordEncoder.encode(newUser.password()), newUser.email(), RoleType.ADMIN);
-
-        saveUser(user);
-    }
-
-    @Override
-    public void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, UnauthorizedException {
-        checkIfUserExists(updatedUser);
-        checkIfUserHasPermission(id);
 
         UserEntity user = getUserById(id);
 
-        saveUser(user);
+        save(userMapper.updateToEntity(updatedUser, user));
     }
 
     @Override
-    public void deleteUser(Long id) throws NotFoundException, UnauthorizedException {
-        checkIfUserExistsById(id);
-        checkIfUserHasPermission(id);
+    public void deleteUser(String authUserEmail, Long id) throws NotFoundException, UnauthorizedAccessException {
+        UserEntity authUser = getAuthenticatedUser(authUserEmail);
 
-        userRepository.deleteById(id);
+        validateExistsId(id);
+        validateIsAuthorized(authUser, id);
+
+        deleteById(id);
     }
+
+    //
 
     @Override
     public void registerUser(NewUserDTO newUser) throws AlreadyExistsException {
@@ -125,40 +119,63 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void checkIfUserExistsById(Long id) throws NotFoundException {
-        if(!userRepository.existsById(id)) {
-            throw new NotFoundException("User does not exists");
+    @Override
+    public UserEntity findById(Long id) throws NotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+    }
+
+    @Override
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public void deleteById(long id) {
+       userRepository.deleteById(id);
+    }
+
+    public UserEntity getAuthenticatedUser(String authUserEmail) throws NotFoundException {
+        return userRepository.findByEmail(authUserEmail).orElseThrow(() -> new NotFoundException("Not found"));
+    }
+
+    public void validateIsAdmin(UserEntity authUser) throws UnauthorizedAccessException {
+        String  userRole = authUser.getRole().toString();
+
+        if (!userRole.equals("ADMIN")) {
+            throw new  UnauthorizedAccessException("User  access this resource.");
         }
     }
 
-    public void checkIfUserHasPermission(Long userId) throws UnauthorizedException, NotFoundException  {
-        UserEntity user = getUserById(userId);
+    @Override
+    public UserEntity save(UserEntity user) {
+        return userRepository.save(user);
+    }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-
-        UserEntity currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new NotFoundException("Authenticated user not found"));
-
-        boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().toString().equals("ADMIN");
-
-        if (!user.getId().equals(currentUser.getId()) && !isAdmin) {
-            throw new UnauthorizedException("Unauthorized");
+    public void validateExistsId(Long id) throws NotFoundException{
+        if(!userRepository.existsById(id)){
+            throw new NotFoundException("Id '" + id + "' Not found");
         }
     }
 
-    public void isUserId(Long id, String email) throws NotFoundException, UnauthorizedException {
-        UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Not found"));
-
-        if(!user.getEmail().equals(email)) {
-            throw new UnauthorizedException("Unauthorized");
+    public void validateAlreadyExistsEmail(String email) throws AlreadyExistsException {
+        if (userRepository.existsByEmail(email)){
+            throw new AlreadyExistsException("User email '" + email + "' is already taken");
         }
     }
 
-    public void isAdmin(String role) throws UnauthorizedException {
-        if (!role.equals("[ADMIN]")){
-            throw new UnauthorizedException("Unauthorized");
+    public void validateAlreadyExistsUsername(String username) throws AlreadyExistsException {
+        if (userRepository.existsByUsername(username)){
+            throw new AlreadyExistsException("Username '" + username + "' is already taken");
+        }
+    }
+
+    public boolean validateIsUserId(UserEntity authUser, Long id) {
+        return authUser.getId().equals(id);
+    }
+
+    public void validateIsAuthorized(UserEntity authUser, Long id) throws UnauthorizedAccessException {
+        if (!validateIsUserId(authUser, id)) {
+            validateIsAdmin(authUser);
         }
     }
 }

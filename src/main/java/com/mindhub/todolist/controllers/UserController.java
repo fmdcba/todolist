@@ -2,11 +2,7 @@ package com.mindhub.todolist.controllers;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
-import com.mindhub.todolist.dtos.UserRecordDTO;
-import com.mindhub.todolist.exceptions.AlreadyExistsException;
-import com.mindhub.todolist.exceptions.InvalidArgumentException;
-import com.mindhub.todolist.exceptions.NotFoundException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
+import com.mindhub.todolist.exceptions.*;
 import com.mindhub.todolist.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,22 +26,21 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "Return user data, and http code status OK")
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
         @ApiResponse(responseCode = "401", description = "Error msg Unauthorized trying to get other users ID with user role")
-    public UserDTO getUser(@PathVariable long id, Authentication authentication) throws NotFoundException, InvalidArgumentException, UnauthorizedException {
+    public UserDTO getUser(@PathVariable long id, Authentication authentication) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException {
         validateId(id);
-        String userRole = getUserRole(authentication);
-        String userEmail =  getUserEmail(authentication);
+        String authUserEmail = getAuthenticatedUserEmail(authentication);
 
-        return userService.getUser(id, userRole, userEmail);
+        return userService.getUser(authUserEmail, id);
     }
 
     @GetMapping
     @Operation(summary = "Get all users", description = "Returns all users if logged as admin")
     @ApiResponse(responseCode = "200", description = "Returns a collection of all users")
     @ApiResponse(responseCode = "401", description = "Error msg Unauthorized when trying to get all users with user role")
-    public ResponseEntity<Set<UserRecordDTO>> getAllUsers(Authentication authentication) throws UnauthorizedException {
-        String userRole = getUserRole(authentication);
+    public ResponseEntity<?> getAllUsers(Authentication authentication) throws NotFoundException, UnauthorizedAccessException {
+        String authUserEmail = getAuthenticatedUserEmail(authentication);
 
-        Set<UserRecordDTO> users = userService.getAllUsers(userRole);
+        List<UserDTO> users = userService.getAllUsers(authUserEmail);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -54,21 +48,25 @@ public class UserController {
     @Operation(summary = "Create user", description = "Recieves a user, posts it and return a confirmation message")
         @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
         @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
-    public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO, Authentication authentication) throws AlreadyExistsException, InvalidArgumentException {
-        validateUser(newUserDTO);
-        String userRole = getUserRole(authentication);
+    public ResponseEntity<?> createUser(@RequestBody NewUserDTO newUserDTO, Authentication authentication) throws AlreadyExistsException, InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
+        // validateEntries()
+        validateUser(newUserDTO); // erase
+        String authUserEmail = getAuthenticatedUserEmail(authentication);
 
-        userService.createUser(newUserDTO, userRole);
-        return new ResponseEntity<>("User created", HttpStatus.CREATED);
+        userService.createUser(newUserDTO, authUserEmail);
+        return new ResponseEntity<>("User created succefully.", HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "Edit user", description = "Edit a user or any of it's field")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: User updated")
         @ApiResponse(responseCode = "404", description = "When trying to patch non existent user. Confirmation msg on body: user not found")
-    public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser,@PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException, UnauthorizedException {
+    public ResponseEntity<?> updateUser(@RequestBody NewUserDTO updatedUser, Authentication authentication, @PathVariable Long id) throws NotFoundException, InvalidArgumentException, AlreadyExistsException, UnauthorizedAccessException {
         validateId(id);
-        userService.updateUser(updatedUser, id);
+        validateEntries(updatedUser);
+        String authUserEmail = getAuthenticatedUserEmail(authentication);
+
+        userService.updateUser(updatedUser, authUserEmail, id);
         return new ResponseEntity<>("updated user", HttpStatus.OK);
     }
 
@@ -76,25 +74,15 @@ public class UserController {
     @Operation(summary = "Delete user", description = "Deletes a user")
         @ApiResponse(responseCode = "200", description = "confirmation msg on body: User deleted")
         @ApiResponse(responseCode = "400", description = "When trying to delete a user with invalid ID. Confimations msg on body: invalid ID")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedException {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
         validateId(id);
-        userService.deleteUser(id);
+        String authUserEmail = getAuthenticatedUserEmail(authentication);
+
+        userService.deleteUser(authUserEmail, id);
         return new ResponseEntity<>("deleted user", HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public String getUserName(Authentication authentication){
-        Collection<?> auth = authentication.getAuthorities();
-        // String cred = authentication.getCredentials();
-        String det = authentication.getDetails().toString();
-        String name = authentication.getName();
-
-        return authentication.getAuthorities()
-                .stream()
-                .map(authority -> authority.getAuthority())
-                .toList()
-                .toString();
-    }
+    //
 
     public void validateId(Long id) throws InvalidArgumentException {
         if (id == null  || id <= 0) {
@@ -116,15 +104,18 @@ public class UserController {
         }
     }
 
-    public String getUserRole(Authentication authentication) {
-        return authentication.getAuthorities()
-                .stream()
-                .map(authority -> authority.getAuthority())
-                .toList()
-                .toString();
+
+    public String getAuthenticatedUserEmail(Authentication authentication){
+        return authentication.getName();
     }
 
-    public String getUserEmail(Authentication authentication) {
-        return authentication.getName();
+    public void validateEntries(NewUserDTO user) throws InvalidArgumentException {
+        if (user.username() == null || user.username().isBlank()) {
+            throw new InvalidArgumentException("Username must not be null or empty");
+        }
+
+        if (user.password() == null || user.password().isBlank()) {
+            throw new InvalidArgumentException("Password must not be null or empty");
+        }
     }
 }
