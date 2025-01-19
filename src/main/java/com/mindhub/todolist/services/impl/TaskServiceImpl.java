@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
         serviceValidations.validateExistsId(id);
         serviceValidations.validateIsAuthorized(authUser, id);
 
-        taskRepository.deleteById(id);
+        deleteById(id);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteById(long id) {
-
+        taskRepository.deleteById(id);
     }
 
     @Override
