@@ -5,7 +5,6 @@ import com.mindhub.todolist.dtos.TaskDTO;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.exceptions.UnauthorizedAccessException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.services.TaskService;
 import com.mindhub.todolist.utils.ControllerValidations;
@@ -32,7 +31,7 @@ public class TaskController {
     @Operation(summary = "Get a task", description = "Return a task and it's attributes")
         @ApiResponse(responseCode = "200", description = "Return the task with a status code of OK")
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
-    public TaskDTO getTask(@PathVariable long id) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException, UnauthorizedException {
+    public TaskDTO getTask(@PathVariable long id) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException {
         controllerValidations.validateId(id);
         String authUserEmail = controllerValidations.getAuthUserEmail();
 
@@ -54,7 +53,7 @@ public class TaskController {
     @Operation(summary = "Create a task", description = "Recieves a task, posts it and return a confirmation message")
         @ApiResponse(responseCode = "201", description = "confirmation msg on body: Task created")
         @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: Task title must not be null or empty or user does not exists")
-    public ResponseEntity<?> createTask(@RequestBody NewTaskDTO newTaskDTO) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException {
+    public ResponseEntity<?> createTask(@RequestBody NewTaskDTO newTaskDTO) throws InvalidArgumentException, NotFoundException {
         validateEntries(newTaskDTO);
         String authUserEmail = controllerValidations.getAuthUserEmail();
 

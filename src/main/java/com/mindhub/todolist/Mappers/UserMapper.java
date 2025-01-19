@@ -4,7 +4,6 @@ import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.models.RoleType;
 import com.mindhub.todolist.models.UserEntity;
-import com.mindhub.todolist.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,9 +12,6 @@ import java.util.List;
 
 @Component
 public class UserMapper {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;

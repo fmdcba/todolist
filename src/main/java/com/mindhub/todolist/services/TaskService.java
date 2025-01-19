@@ -2,15 +2,12 @@ package com.mindhub.todolist.services;
 
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
-import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.exceptions.InvalidArgumentException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.exceptions.UnauthorizedAccessException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.Task;
 
 import java.util.List;
-import java.util.Set;
 
 public interface TaskService extends GenericService<Task> {
 

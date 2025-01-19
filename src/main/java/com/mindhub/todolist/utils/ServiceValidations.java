@@ -22,7 +22,6 @@ public class ServiceValidations {
         return userRepository.findByEmail(authUserEmail).orElseThrow(() -> new NotFoundException("Authenticated user not found."));
     }
 
-
     public void validateExistsId(Long id) throws NotFoundException {
         if(!userRepository.existsById(id)){
             throw new NotFoundException("Id '" + id + "' Not found");

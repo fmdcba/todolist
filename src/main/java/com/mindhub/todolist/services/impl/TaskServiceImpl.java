@@ -3,11 +3,8 @@ package com.mindhub.todolist.services.impl;
 import com.mindhub.todolist.Mappers.TaskMapper;
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
-import com.mindhub.todolist.dtos.TaskRecordDTO;
-import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.exceptions.UnauthorizedAccessException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
 import com.mindhub.todolist.models.Task;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.TaskRepository;
@@ -15,13 +12,9 @@ import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.TaskService;
 import com.mindhub.todolist.utils.ServiceValidations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -84,12 +77,6 @@ public class TaskServiceImpl implements TaskService {
         serviceValidations.validateIsAuthorized(authUser, id);
 
         taskRepository.deleteById(id);
-    }
-
-    public void checkIfTaskExistsById(Long id) throws NotFoundException {
-        if(!userRepository.existsById(id)) {
-            throw new NotFoundException("User does not exists");
-        }
     }
 
     @Override
