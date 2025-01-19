@@ -26,7 +26,7 @@ public class TaskController {
         @ApiResponse(responseCode = "400", description = "Error msg when trying to get with non existent or invalid ID")
     public TaskDTO getTask(@PathVariable long id) throws NotFoundException, InvalidArgumentException, UnauthorizedException {
         validateId(id);
-        return taskService.getTaskDTOById(id);
+        return taskService.getTask(id);
     }
 
     @PostMapping

@@ -10,9 +10,9 @@ import com.mindhub.todolist.models.Task;
 
 import java.util.Set;
 
-public interface TaskService {
+public interface TaskService extends GenericService {
 
-    TaskDTO getTaskDTOById(Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
+    TaskDTO getTask(Long id) throws  UnauthorizedException, NotFoundException, InvalidArgumentException;
 
     void createTask(NewTaskDTO task) throws InvalidArgumentException, NotFoundException;
 

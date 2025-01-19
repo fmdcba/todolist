@@ -28,7 +28,7 @@ public class TaskServiceImpl implements TaskService {
     private UserRepository userRepository;
 
     @Override
-    public TaskDTO getTaskDTOById(Long id) throws UnauthorizedException, NotFoundException {
+    public TaskDTO getTask(Long id) throws UnauthorizedException, NotFoundException {
         checkIfUserHasPermissionForTask(id);
 
         return new TaskDTO(getTaskById(id));
@@ -98,5 +98,25 @@ public class TaskServiceImpl implements TaskService {
         if (!task.getUser().getId().equals(currentUser.getId()) && !isAdmin) {
             throw new UnauthorizedException("Unauthorized");
         }
+    }
+
+    @Override
+    public Object findById(Long Id) {
+        return null;
+    }
+
+    @Override
+    public List findAll() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteById(long id) {
+
+    }
+
+    @Override
+    public Object save(Object entity) {
+        return null;
     }
 }
