@@ -1,38 +1,21 @@
 package com.mindhub.todolist.services;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
-import com.mindhub.todolist.dtos.TaskRecordDTO;
 import com.mindhub.todolist.dtos.UserDTO;
-import com.mindhub.todolist.dtos.UserRecordDTO;
-import com.mindhub.todolist.exceptions.AlreadyExistsException;
-import com.mindhub.todolist.exceptions.InvalidArgumentException;
-import com.mindhub.todolist.exceptions.NotFoundException;
-import com.mindhub.todolist.exceptions.UnauthorizedException;
+import com.mindhub.todolist.exceptions.*;
 import com.mindhub.todolist.models.UserEntity;
 
-import java.util.Set;
+import java.util.List;
 
-public interface UserService {
+public interface UserService extends GenericService<UserEntity> {
 
-    UserDTO getUserDTOById(Long id) throws NotFoundException, InvalidArgumentException, UnauthorizedException;
+    UserDTO getUser(String email, Long id) throws NotFoundException, InvalidArgumentException, UnauthorizedAccessException;
 
-    void createUser(NewUserDTO user) throws InvalidArgumentException, AlreadyExistsException;
+    List<UserDTO> getAllUsers(String authUserEmail) throws NotFoundException, UnauthorizedAccessException;
 
-    void createAdmin (NewUserDTO user) throws InvalidArgumentException, AlreadyExistsException;
+    void createUser(NewUserDTO user, String role) throws InvalidArgumentException, AlreadyExistsException, NotFoundException, UnauthorizedAccessException;
 
-    void updateUser(NewUserDTO updatedUser, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException, UnauthorizedException;
+    void updateUser(NewUserDTO updatedUser, String email, Long id) throws NotFoundException, AlreadyExistsException, InvalidArgumentException, UnauthorizedAccessException;
 
-    void deleteUser(Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedException;
-
-    UserEntity getUserById(Long id) throws NotFoundException;
-
-    UserEntity saveUser(UserEntity newUser);
-
-    Set<UserRecordDTO> getAllUsers();
-
-    void checkIfUserHasPermission(Long userId) throws UnauthorizedException, NotFoundException;
-
-    void checkIfUserExists(NewUserDTO newUser) throws AlreadyExistsException;
-
-    void checkIfUserExistsById(Long id) throws NotFoundException;
+    void deleteUser(String authUserEmail, Long id) throws InvalidArgumentException, NotFoundException, UnauthorizedAccessException;
 }
