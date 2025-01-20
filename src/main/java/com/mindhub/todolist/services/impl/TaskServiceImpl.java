@@ -1,6 +1,6 @@
 package com.mindhub.todolist.services.impl;
 
-import com.mindhub.todolist.Mappers.TaskMapper;
+import com.mindhub.todolist.mappers.TaskMapper;
 import com.mindhub.todolist.dtos.NewTaskDTO;
 import com.mindhub.todolist.dtos.TaskDTO;
 import com.mindhub.todolist.exceptions.NotFoundException;
@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
         serviceValidations.validateExistsId(id);
         serviceValidations.validateIsAuthorized(authUser, id);
 
-        taskRepository.deleteById(id);
+        deleteById(id);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteById(long id) {
-
+        taskRepository.deleteById(id);
     }
 
     @Override

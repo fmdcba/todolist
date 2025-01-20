@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Sign in", description = "Receives credential for a user in the body and return a confirmation message")
+    @Operation(summary = "Sign up", description = "Receives credential for a user in the body and return a confirmation message")
     @ApiResponse(responseCode = "201", description = "confirmation msg on body: User created")
     @ApiResponse(responseCode = "400", description = "Point a required missing part of the data. E.g: User title must not be null or empty")
     public ResponseEntity<?> registerUser(@RequestBody NewUserDTO newUserDTO) throws AlreadyExistsException, InvalidArgumentException {
