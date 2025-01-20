@@ -1,4 +1,4 @@
-package com.mindhub.todolist.Mappers;
+package com.mindhub.todolist.mappers;
 
 import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
