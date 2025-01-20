@@ -107,14 +107,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -139,14 +139,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -171,14 +171,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -211,7 +211,7 @@
 										}
 									}
 								},
-								"url": "localhost:8080/api/user"
+								"url": "localhost:8080/api/users"
 							},
 							"response": []
 						},
@@ -235,12 +235,12 @@
 										}
 									}
 								},
-								"url": "localhost:8080/api/user"
+								"url": "localhost:8080/api/users"
 							},
 							"response": []
 						},
 						{
-							"name": "Patch Non Existent User",
+							"name": "Put Non Existent User",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -248,7 +248,7 @@
 										"token": "{{JWT}}"
 									}
 								},
-								"method": "PATCH",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -260,14 +260,14 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -281,7 +281,7 @@
 							"response": []
 						},
 						{
-							"name": "Patch User With Other ID",
+							"name": "Put User With Other ID",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -289,7 +289,7 @@
 										"token": "{{JWT}}"
 									}
 								},
-								"method": "PATCH",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -301,14 +301,14 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -333,14 +333,14 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -365,14 +365,14 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/user/:id",
+									"raw": "localhost:8080/api/users/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"user",
+										"users",
 										":id"
 									],
 									"variable": [
@@ -403,17 +403,22 @@
 								"value": "",
 								"type": "text",
 								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/users/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"users",
 								":id"
 							],
 							"variable": [
@@ -423,6 +428,21 @@
 								}
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/api/users"
 					},
 					"response": []
 				},
@@ -446,18 +466,24 @@
 								}
 							}
 						},
-						"url": "localhost:8080/api/user"
+						"url": "localhost:8080/api/users"
 					},
 					"response": []
 				},
 				{
 					"name": "UpdateUser",
 					"request": {
-						"method": "PATCH",
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"username\":\"pepon\"}",
+							"raw": "{\"username\":\"pep556455o\", \"password\": \"pepe123\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -465,14 +491,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/users/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"users",
 								":id"
 							],
 							"variable": [
@@ -488,23 +514,29 @@
 				{
 					"name": "DeleteUser",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/users/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"users",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "2"
 								}
 							]
 						}
@@ -527,7 +559,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "localhost:8080/api/admin/user/all"
+						"url": "localhost:8080/api/users"
 					},
 					"response": []
 				},
@@ -542,7 +574,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "localhost:8080/api/task/all"
+						"url": "localhost:8080/api/admin/task/all"
 					},
 					"response": []
 				},
@@ -558,85 +590,20 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/task/:id",
+							"raw": "localhost:8080/api/tasks/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"task",
+								"tasks",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
 									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Admin",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{JWT}}"
-							}
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"admin2\", \"password\": \"admin1234\", \"email\": \"admin2@admin.com\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "localhost:8080/api/admin"
-					},
-					"response": []
-				},
-				{
-					"name": "Patch Admin",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{JWT}}"
-							}
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"admin3\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/api/user/:id",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"user",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "5"
 								}
 							]
 						}
@@ -655,14 +622,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/users/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"users",
 								":id"
 							],
 							"variable": [
@@ -687,14 +654,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/user/:id",
+							"raw": "localhost:8080/api/users/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"user",
+								"users",
 								":id"
 							],
 							"variable": [
@@ -727,14 +694,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -759,14 +726,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -799,7 +766,7 @@
 										}
 									}
 								},
-								"url": "localhost:8080/api/task"
+								"url": "localhost:8080/api/tasks"
 							},
 							"response": []
 						},
@@ -812,7 +779,7 @@
 										"token": "{{JWT}}"
 									}
 								},
-								"method": "PATCH",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -824,14 +791,14 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -856,14 +823,14 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -885,7 +852,7 @@
 										"token": "{{JWT}}"
 									}
 								},
-								"method": "PATCH",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -897,14 +864,14 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -926,7 +893,7 @@
 										"token": "{{JWT}}"
 									}
 								},
-								"method": "PATCH",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -938,14 +905,14 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -970,20 +937,20 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
 										{
 											"key": "id",
-											"value": "2"
+											"value": ""
 										}
 									]
 								}
@@ -1002,14 +969,14 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8080/api/task/:id",
+									"raw": "localhost:8080/api/tasks/:id",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
 										"api",
-										"task",
+										"tasks",
 										":id"
 									],
 									"variable": [
@@ -1036,14 +1003,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/task/:id",
+							"raw": "localhost:8080/api/tasks/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"task",
+								"tasks",
 								":id"
 							],
 							"variable": [
@@ -1057,20 +1024,41 @@
 					"response": []
 				},
 				{
+					"name": "Get All tasks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/api/tasks"
+					},
+					"response": []
+				},
+				{
 					"name": "Create new task",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Finish Homework\",\r\n  \"description\": \"Complete the homework for the Spring Boot course\",\r\n  \"status\": \"PENDING\",\r\n  \"user\": {\r\n    \"id\": 1\r\n  }\r\n}",
+							"raw": "{\r\n  \"title\": \"Finish Homework\",\r\n  \"description\": \"Complete the homework for the Spring Boot course\",\r\n  \"status\": \"PENDING\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": "localhost:8080/api/task"
+						"url": "localhost:8080/api/tasks"
 					},
 					"response": []
 				},
@@ -1083,11 +1071,11 @@
 								"token": "{{JWT}}"
 							}
 						},
-						"method": "PATCH",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"title\": \"Ir a spinning\"}",
+							"raw": "{\"title\": \"Ir a spinning\", \"description\": \"hacer hacer ejerciocio\", \"status\": \"COMPLETED\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1095,20 +1083,20 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/api/task/:id",
+							"raw": "localhost:8080/api/tasks/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"task",
+								"tasks",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "2"
 								}
 							]
 						}
@@ -1118,17 +1106,23 @@
 				{
 					"name": "Delete task by ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{JWT}}"
+							}
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/task/:id",
+							"raw": "localhost:8080/api/tasks/:id",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"task",
+								"tasks",
 								":id"
 							],
 							"variable": [
