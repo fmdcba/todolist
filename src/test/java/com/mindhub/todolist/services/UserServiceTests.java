@@ -1,23 +1,26 @@
 package com.mindhub.todolist.services;
 
-import com.mindhub.todolist.dtos.NewUserDTO;
 import com.mindhub.todolist.dtos.UserDTO;
-import com.mindhub.todolist.exceptions.AlreadyExistsException;
 import com.mindhub.todolist.exceptions.NotFoundException;
 import com.mindhub.todolist.exceptions.UnauthorizedAccessException;
 import com.mindhub.todolist.mappers.UserMapper;
-import com.mindhub.todolist.models.RoleType;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.repositories.UserRepository;
 import com.mindhub.todolist.services.impl.UserServiceImpl;
+import com.mindhub.todolist.utils.Constants;
+import com.mindhub.todolist.utils.Factory;
 import com.mindhub.todolist.utils.ServiceValidations;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,59 +38,63 @@ public class UserServiceTests {
     @InjectMocks
     private UserServiceImpl userService;
 
-    private NewUserDTO newUserDTO;
     private String authUserEmail;
+    private Long validUserId;
+    private Long NonExistentId;
     private UserEntity authUser;
-    private UserEntity mappedUserEntity;
+    private UserEntity targetUser;
+    private UserDTO expectedUserDTO;
 
     @BeforeEach
     public void setUp() {
-        newUserDTO = new NewUserDTO(
-                null,
-                "testUser",
-                "password",
-                "test@example.com",
-                RoleType.USER
+        authUserEmail = Constants.VALID_EMAIL;
+        validUserId = Constants.VALID_ID;
+        NonExistentId = Constants.INVALID_ID;
+        authUser = Factory.createValidUserEntity();
+        targetUser = Factory.createValidTargetUserEntity();
+        expectedUserDTO  = new UserDTO(targetUser);
+    }
+
+    @Test
+    @DisplayName("When given valid ID returns a userDTO")
+    public void getUser_whenGivenIdIsValid() throws NotFoundException, UnauthorizedAccessException {
+        when(serviceValidations.validateExistsAuthenticatedUser(authUserEmail)).thenReturn(authUser);
+        doNothing().when(serviceValidations).validateExistsId(validUserId);
+        doNothing().when(serviceValidations).validateIsAuthorized(authUser, validUserId);
+        when(userRepository.findById(validUserId)).thenReturn(Optional.of(targetUser));
+        when(userMapper.userToDTO(targetUser)).thenReturn(expectedUserDTO);
+
+        UserDTO result = userService.getUser(authUserEmail, validUserId);
+
+        assertNotNull(result);
+        assertEquals(expectedUserDTO.getId(), result.getId());
+        assertEquals(expectedUserDTO.getUsername(), result.getUsername());
+        assertEquals(expectedUserDTO.getEmail(), result.getEmail());
+        assertEquals(expectedUserDTO.getTasks(), result.getTasks());
+    }
+
+    @Test
+    @DisplayName("When given NonExistent ID throws NotFoundException")
+    public void getUser_whenIdNonExistent_shouldThrowNotFound() throws NotFoundException {
+        when(serviceValidations.validateExistsAuthenticatedUser(authUserEmail)).thenReturn(authUser);
+        doThrow(new NotFoundException("Id '" + NonExistentId + "' Not found"))
+                .when(serviceValidations).validateExistsId(NonExistentId);
+
+        assertThrows(NotFoundException.class, () ->
+                userService.getUser(authUserEmail, NonExistentId)
         );
-
-        authUserEmail = "admin@example.com";
-        authUser = new UserEntity("admin", "encodedPass", authUserEmail, RoleType.ADMIN);
-        mappedUserEntity = new UserEntity("testUser", "encodedPassword", "test@example.com", RoleType.USER);
     }
 
     @Test
-    public void createUser_WhenPassedValidDTO_ShouldCallDependenciesAndSave()
-            throws AlreadyExistsException, NotFoundException, UnauthorizedAccessException {
+    @DisplayName("When user is not authorized to access resource throws UnauthorizedAccessException")
+    public void getUser_whenUserNotAuthorized_shouldThrowUnauthorizedAccessException() throws NotFoundException, UnauthorizedAccessException {
         when(serviceValidations.validateExistsAuthenticatedUser(authUserEmail)).thenReturn(authUser);
-        doNothing().when(serviceValidations).validateAlreadyExistsEntries(newUserDTO.username(), newUserDTO.email());
-        doNothing().when(serviceValidations).validateIsAdmin(authUser);
-        when(userMapper.userToEntity(newUserDTO)).thenReturn(mappedUserEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(mappedUserEntity);
+        doNothing().when(serviceValidations).validateExistsId(validUserId);
+        doThrow(new UnauthorizedAccessException("User unable to access this resource."))
+                .when(serviceValidations).validateIsAuthorized(authUser, validUserId);
 
-        userService.createUser(newUserDTO, authUserEmail);
-
-        verify(serviceValidations).validateExistsAuthenticatedUser(authUserEmail);
-        verify(serviceValidations).validateAlreadyExistsEntries(newUserDTO.username(), newUserDTO.email());
-        verify(serviceValidations).validateIsAdmin(authUser);
-        verify(userMapper).userToEntity(newUserDTO);
-        verify(userRepository).save(mappedUserEntity);
-    }
-
-    @Test
-    public void throwException_WhenUsernameAlreadyExits()
-            throws AlreadyExistsException, NotFoundException, UnauthorizedAccessException {
-        when(serviceValidations.validateExistsAuthenticatedUser(authUserEmail)).thenReturn(authUser);
-        doNothing().when(serviceValidations).validateAlreadyExistsEntries(newUserDTO.username(), newUserDTO.email());
-        doNothing().when(serviceValidations).validateIsAdmin(authUser);
-        when(userMapper.userToEntity(newUserDTO)).thenReturn(mappedUserEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(mappedUserEntity);
-
-        userService.createUser(newUserDTO, authUserEmail);
-
-        verify(serviceValidations).validateExistsAuthenticatedUser(authUserEmail);
-        verify(serviceValidations).validateAlreadyExistsEntries(newUserDTO.username(), newUserDTO.email());
-        verify(serviceValidations).validateIsAdmin(authUser);
-        verify(userMapper).userToEntity(newUserDTO);
-        verify(userRepository).save(mappedUserEntity);
+        assertThrows(UnauthorizedAccessException.class, () ->
+                userService.getUser(authUserEmail, validUserId)
+        );
     }
 }

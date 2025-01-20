@@ -3,6 +3,7 @@ package com.mindhub.todolist.repositories;
 import com.mindhub.todolist.config.TestConfig;
 import com.mindhub.todolist.models.UserEntity;
 import com.mindhub.todolist.utils.Constants;
+import com.mindhub.todolist.utils.Factory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class UserRepositoryTests {
     @Test
     @DisplayName("When given valid email returns a user entity")
     public void findUser_whenEmailIsValid() {
-        UserEntity sut = Constants.createValidUserEntity();
+        UserEntity sut = Factory.createValidUserEntity();
         userRepository.save(sut);
 
         Optional<UserEntity> foundUser = userRepository.findByEmail(Constants.VALID_EMAIL);
@@ -49,7 +50,7 @@ public class UserRepositoryTests {
     @Test
     @DisplayName("when given valid username returns true")
     public void returnTrue_WhenExistsUserByUsername() {
-        UserEntity sut = Constants.createValidUserEntity();
+        UserEntity sut = Factory.createValidUserEntity();
         userRepository.save(sut);
 
         Boolean foundUser = userRepository.existsByUsername(Constants.VALID_USERNAME);
@@ -72,7 +73,7 @@ public class UserRepositoryTests {
     @Test
     @DisplayName("when given valid email returns true")
     public void returnTrue_whenExistsUserByEmail() {
-        UserEntity sut = Constants.createValidUserEntity();
+        UserEntity sut = Factory.createValidUserEntity();
         userRepository.save(sut);
 
         Boolean foundUser = userRepository.existsByEmail(Constants.VALID_EMAIL);
