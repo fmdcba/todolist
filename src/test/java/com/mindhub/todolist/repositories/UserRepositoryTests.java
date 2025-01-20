@@ -25,7 +25,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("When given valid email returns a user entity")
-    public void findUserByEmailOk() {
+    public void findUser_whenEmailIsValid() {
         UserEntity sut = Constants.createValidUserEntity();
         userRepository.save(sut);
 
@@ -37,7 +37,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("When given non-existent email returns empty")
-    public void findUserByEmailNotFound() {
+    public void notFindUser_whenEmailIsNotValid() {
         String nonExistentSutEmail = Constants.NON_EXISTENT_EMAIL;
 
         Optional<UserEntity> foundUser = userRepository.findByEmail(nonExistentSutEmail);
@@ -48,7 +48,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("when given valid username returns true")
-    public void existsUserByUsernameOk() {
+    public void returnTrue_WhenExistsUserByUsername() {
         UserEntity sut = Constants.createValidUserEntity();
         userRepository.save(sut);
 
@@ -60,7 +60,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("when given non-existent username returns false")
-    public void existsUserByUsernameNotFound() {
+    public void returnFalse_whenNotExistsUserByUsername() {
         String nonExistentSutUsername = Constants.NON_EXISTENT_USERNAME;
 
         Boolean foundUser = userRepository.existsByUsername(nonExistentSutUsername);
@@ -71,7 +71,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("when given valid email returns true")
-    public void existsUserByEmailOk() {
+    public void returnTrue_whenExistsUserByEmail() {
         UserEntity sut = Constants.createValidUserEntity();
         userRepository.save(sut);
 
@@ -83,7 +83,7 @@ public class UserRepositoryTests {
 
     @Test
     @DisplayName("when given non-existent email returns false")
-    public void existsUserByEmailNotFound() {
+    public void returnFalse_whenNotExistsUserByEmail() {
         String nonExistentEmail = Constants.NON_EXISTENT_EMAIL;
 
         Boolean foundUser = userRepository.existsByEmail(nonExistentEmail);
