@@ -1,32 +1,34 @@
 package com.mindhub.todolist.controllers;
 
-import com.mindhub.todolist.config.JwtUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindhub.todolist.config.TestConfig;
+import com.mindhub.todolist.dtos.UserDTO;
 import com.mindhub.todolist.services.UserService;
 import com.mindhub.todolist.utils.ControllerValidations;
+import com.mindhub.todolist.utils.Factory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(UserController.class)
 @Import(TestConfig.class)
-@SpringBootTest
-@AutoConfigureMockMvc
 class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    private JwtUtils jwtUtil;
 
     @Mock
     private ControllerValidations controllerValidations;
@@ -35,17 +37,29 @@ class UserControllerTests {
     private UserService userService;
 
     @Autowired
-    private JwtUtils jwtUtils;
+    private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void getUser_withMockedJwt_returnsUserDTO() throws Exception {
-        when(jwtUtils.generateToken(anyString())).thenReturn("fakeToken");
-        // or if your code verifies tokens, you can mock that, too
+    public void getUserOK() throws Exception {
+        Long userId = 7L;
+        String emailUser = "pepe@pepe.com";
+        UserDTO expected = new UserDTO(Factory.createValidUserEntity());
 
-        mockMvc.perform(get("/api/users/1")
-                        .header("Authorization", "Bearer fakeToken"))
-                .andExpect(status().isOk());
+        Mockito.doNothing().when(controllerValidations).validateId(userId);
+        Mockito.when(controllerValidations.getAuthUserEmail()).thenReturn(emailUser);
+        Mockito.when(userService.getUser(emailUser, userId)).thenReturn(expected);
+
+        this.mockMvc.perform(get("/api/users/" + userId))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
     }
 }
 
+//alt+énter importttttaa
+//shift + suopr chau linea com el diego
