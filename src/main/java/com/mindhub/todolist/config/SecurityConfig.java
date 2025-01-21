@@ -42,7 +42,6 @@ public class SecurityConfig {
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ,"/h2-console/**").permitAll()
                                 .requestMatchers( "/api/auth/**").permitAll()
                                 .requestMatchers("/api/users/**", "/api/tasks/**").hasAnyAuthority("USER", "ADMIN")
-                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest().denyAll() // All other requests must be authenticated
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
